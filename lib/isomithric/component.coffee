@@ -62,7 +62,7 @@ module.exports = class extends Module
 
   @View: class extends Module
 
-    constructor: (p, s = {}) ->
+    constructor: (p, s={}) ->
       _.assign @, p
       @state = s
 

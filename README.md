@@ -4,36 +4,27 @@
 
 Here's an example of a component that uses a component:
 
-    Article = require "./article"
     Sidebar = require "./sidebar"
 
     module.exports = class extends Component
 
       @State: class
         constructor: ->
-          @sidebar = new Sidebar()
+          @sidebar = new Sidebar().render
 
       @View: class
+
+        # p = properties passed in via `Component.render`
+        # s = cached `State` instance
+        #
         constructor: (p, s) ->
-          #   p = properties passed in via `Component.render`
-          #   s = cached `State` instance
+          # Assign class instance variables from `p`.
           #
-          @server  = p.server
-          @sidebar = s.sidebar.render
-
-          # `@param` gets parameters client or server side.
-          #
-          id = @param("id")
-
-          # `Article.map` is a simple key/value store for
-          # `Article` instances.
-          #
-          @article = Article.map(id).render
+          super(p, s)
 
         render: ->
           [
             HEADER("my header")
-            @article(title: "hello")
             @sidebar()
           ]
 
@@ -64,16 +55,11 @@ Example of how to implement a layout server side:
 
       @State: class
         constructor: ->
-          @layout = new Layout()
+          @layout = new Layout().render
 
       @View: class
         constructor: (p, s) ->
-          @layout = s.layout.render
-
-          # The server property contains express.js params
-          # (if server side).
-          #
-          @server = p.server
+          super(p, s)
 
         render: ->
           content = HEADER("My Site")
