@@ -24,7 +24,7 @@ module.exports = class
 
     # Set up express.
     #
-    @app  = express()
+    @app = express()
     port = process.env.PORT or 8000
 
     @app.use bodyParser.urlencoded(extended: true)

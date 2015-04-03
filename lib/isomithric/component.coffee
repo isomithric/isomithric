@@ -62,9 +62,11 @@ module.exports = class extends Module
 
   @View: class extends Module
 
-    constructor: (p, s={}) ->
+    constructor: (p, s) ->
+      [ @p, @s ] = [ p, s ]
+
       _.assign @, p
-      @state = s
+      _.assign @, s
 
     param: (id) =>
       if @server
