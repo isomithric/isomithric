@@ -1,19 +1,42 @@
-module.exports = class
-  
-  module_keywords = ['extended', 'included']
+module.exports = class Module
 
-  @extend: (obj) ->
-    for key, value of obj when key not in module_keywords
-      @[key] = value
+  # Class methods
+  #
 
-    obj.extended?.apply(@)
-    @
+  @extend: (to, from) ->
+    [ to, from ] = [ @, to ] unless from
 
-  @include: (obj) ->
-    for key, value of obj when key not in module_keywords
-      # Assign properties to the prototype.
-      #
-      @::[key] = value
+    @merge(to, from)
 
-    obj.included?.apply(@)
-    @
+  @include: (to, from) ->
+    [ to, from ] = [ @, to ] unless from
+
+    @merge(to::, from::)
+
+  @merge: (to, from) ->
+    [ to, from ] = [ @, to ] unless from
+
+    for key, value of from
+      to[key] = value
+    to
+
+  @mixin: (to, from) ->
+    [ to, from ] = [ @, to ] unless from
+
+    @include(to, from)
+    @extend(to, from)
+
+  # Instance methods
+  #
+
+  extend: (from) ->
+    @constructor.merge(@constructor, from)
+
+  include: (from) ->
+    @constructor.merge(@, from)
+
+  merge: (from) ->
+    @constructor.merge(@, from)
+
+  mixin: (from) ->
+    @constructor.mixin(@, from)

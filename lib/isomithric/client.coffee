@@ -1,4 +1,3 @@
-_         = require "lodash"
 m         = require "mithril"
 promise   = require "es6-promise"
 sugartags = require "mithril.sugartags"
@@ -14,7 +13,7 @@ module.exports = class
     #
     m.route.mode = "pathname"
 
-    _.each routes, (Component, path) ->
+    routes.forEach (Component, path) ->
       routes[path] =
         controller: Component
         view:       (c) -> c.render()

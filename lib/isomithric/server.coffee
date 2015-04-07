@@ -1,4 +1,3 @@
-_          = require "lodash"
 express    = require "express"
 device     = require "express-device"
 bodyParser = require "body-parser"
@@ -35,20 +34,26 @@ module.exports = class
 
     # Set up static routes.
     #
-    _.each routes, (Component, path) ->
-      @app.get path, (req, res, next) ->
-        res.type "html"
-
-        res.end render(
-          new Component().render(
+    for path, Component of routes
+      ((path, Component) =>
+        @app.get path, (req, res, next) =>
+          res.type "html"
+          res.end @render(
+            promises: []
             server:
               next: next
               req:  req
               res:  res
           )
-        )
+      )(path, Component)
 
-    # Start express.
-    #
+  render: (props) ->
+    output = new Component(props).render()
+    m.sync(props.promises).then ->
+      render(output)
+
+  # Start express.
+  #
+  start: ->
     console.log "Server is now running on port " + port
     @app.listen port

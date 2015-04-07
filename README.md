@@ -11,6 +11,14 @@ An isomorphic javascript framework for Mithril.
 * Pre-defined gulp tasks for building your projects
 * Global [sugartags](https://github.com/jsguy/mithril.sugartags)
 
+# Philosophy
+
+Your isomorphic Node.js application should only make API calls using `m.request` to retrieve and update data.
+
+API endpoints that speak to the database should exist outside of your isomorphic app, and they should expose the data via something like [JSON API](http://jsonapi.org).
+
+With this approach, you never have to worry about whether you are server or client side, because you are always just speaking HTTP.
+
 ### Get started
 
     npm install -g isomithric
@@ -76,7 +84,9 @@ The `Model` layer is responsible for persisting application data. It also wraps 
 
 ### Layouts
 
-The only difference you should encounter between server and client side is that on server side, you need to render a layout:
+The only difference you should encounter between server and client side is that on server side, you need to render a layout.
+
+Use `@server` to know if you are server side:
 
     module.exports = class extends Component
 
@@ -86,7 +96,8 @@ The only difference you should encounter between server and client side is that 
 
       @View: class
         constructor: (p, s) ->
-          super(p, s)
+          @include(p)
+          @include(s)
 
         render: ->
           content = HEADER("My Site")
