@@ -35,22 +35,21 @@ module.exports = class
     # Set up static routes.
     #
     for path, Component of routes
-      ((path, Component) =>
+      do (path, Component) =>
         @app.get path, (req, res, next) =>
           res.type "html"
           res.end @render(
-            promises: []
+            Component
             server:
               next: next
               req:  req
               res:  res
           )
-      )(path, Component)
 
-  render: (props) ->
+  render: (Component, props={}) ->
+    props.promises ||= []
     output = new Component(props).render()
-    m.sync(props.promises).then ->
-      render(output)
+    m.sync(props.promises).then -> render(output)
 
   # Start express.
   #
