@@ -1,6 +1,3 @@
-express    = require "express"
-device     = require "express-device"
-bodyParser = require "body-parser"
 fakejax    = require "xmlhttprequest"
 m          = require "mithril"
 render     = require "mithril-node-render"
@@ -8,7 +5,7 @@ sugartags  = require "mithril.sugartags"
 
 module.exports = class
 
-  constructor: (routes) ->
+  constructor: (app, routes) ->
     # Make sugartags global.
     #
     sugartags(m, global)
@@ -21,22 +18,11 @@ module.exports = class
     #
     global.window.setTimeout = setTimeout
 
-    # Set up express.
-    #
-    @app = express()
-    port = process.env.PORT or 8000
-
-    @app.use bodyParser.urlencoded(extended: true)
-    @app.use bodyParser.raw()
-    @app.use bodyParser.json()
-    @app.use express.static("./dist/app")
-    @app.use device.capture()
-
     # Set up static routes.
     #
     for path, Component of routes
       do (path, Component) =>
-        @app.get path, (req, res, next) =>
+        app.get path, (req, res, next) =>
           res.type "html"
           res.end @render(
             Component
@@ -50,9 +36,3 @@ module.exports = class
     props.promises ||= []
     output = new Component(props).render()
     m.sync(props.promises).then -> render(output)
-
-  # Start express.
-  #
-  start: ->
-    console.log "Server is now running on port " + port
-    @app.listen port
