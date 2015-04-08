@@ -1,120 +1,105 @@
 ## Isomithric
 
-An isomorphic javascript framework for Mithril.
+An isomorphic javascript framework on top of Mithril.
 
-### What does it do?
+### Philosophy
 
-* Full server side render on first load, single page app for subsequent routes
-* Removes almost any need to distinguish between server or client within your code
-* Provides a common convention for defining Mithril routes and components
-* Allows you to use [m.request](http://lhorie.github.io/mithril/mithril.request.html) on server and client side
-* Pre-defined gulp tasks for building your projects
+* Class-based unidirectional data flow
+* Apps are comprised of "Components" and "Models"
+* Components hold state and business logic for views
+* Models hold persistent data and business logic for that data
+
+### Goals
+
+* Server-side render on first page load, dynamic rendering for subsequent actions
+* Server-side [m.request](http://lhorie.github.io/mithril/mithril.request.html) implementation
+* Server-side [m.route.param](http://lhorie.github.io/mithril/mithril.route.html#defining-routes) implementation
 * Global [sugartags](https://github.com/jsguy/mithril.sugartags)
+* Automatic constructor property argument binding
+* Mixin support for classes
 
-# Philosophy
+### Install
 
-Your isomorphic Node.js application should only make API calls using `m.request` to retrieve and update data.
+    npm install isomithric
 
-API endpoints that speak to the database should exist outside of your isomorphic app, and they should expose the data via something like [JSON API](http://jsonapi.org).
+### Example
 
-With this approach, you never have to worry about whether you are server or client side, because you are always just speaking HTTP.
+`models/article.coffee`:
 
-### Get started
+    module.exports = Iso.model
 
-    npm install -g isomithric
-    isomithric new_project
-    cd new_project
-    gulp
+      get: ->
+        m.request method: "GET", url: "/article/#{@id}"
 
-Now open [http://127.0.0.1:8000](http://127.0.0.1:8000).
+`components/article.coffee`:
 
-### Components
+    Article = require "./models/article"
 
-Here's an example of a component that uses a component:
+    module.exports = Iso.component
 
-    Component = require("isomithric").Component
-    Sidebar   = require "./sidebar"
+      constructor: ->
+        @article = new Article(id: @id).get()
 
-    module.exports = class extends Component
-
-      @State: class
-        constructor: ->
-          @sidebar = new Sidebar().render
-
-      @View: class
-
-        # p = properties passed in via `Component.render`
-        # s = cached `State` instance
-        #
-        constructor: (p, s) ->
-
-          # Assign class instance variables from `p` and `s`.
-          #
-          super(p, s)
-
-        render: ->
+      View: class
+        view: ->
           [
-            HEADER("my header")
-            @sidebar()
+            HEADER @article.title
+            DIV    @article.body
           ]
 
-Use the `State` class to hold any variables that need to persist over the lifetime of the component (including other components).
+`components/home.coffee`:
 
-Every redraw, the framework creates a new instance of `View` and calls `render` on it.
+    Article = require "./components/article"
 
-### Routes
+    module.exports = Iso.component
 
-Routes are located at `app/routes.coffee`.
+      constructor: ->
+        @article = new Article id: m.route.param("id")
+
+      View: class
+        view: ->
+          if @server
+            HTML [
+              BODY [
+                @article.view()
+                SCRIPT src: "/scripts/client.js"
+              ]
+            ]
+          else
+            @article.view()
+
+`routes.coffee`:
 
     Home = require "./components/home"
 
     module.exports =
       "/": Home
 
-### Models
+`server.coffee`:
 
-Models are completely up to you to define, but have a basic signature:
+    Iso    = require "isomithric"
+    routes = require "./routes.coffee"
 
-    Model = require("isomithric").Model
+    app = require("express")()
+    app.use express.static "./dist/app"
 
-    module.exports = class extends Model
-      constructor: ->
+    new Iso.server app, routes
 
-The `Model` layer is responsible for persisting application data. It also wraps the business rules and logic around that data.
+`client.coffee`:
 
-### Layouts
+    Iso    = require "isomithric"
+    routes = require "./routes.coffee"
 
-The only difference you should encounter between server and client side is that on server side, you need to render a layout.
+    new Iso.client routes
 
-Use `@server` to know if you are server side:
+[Use a gulp task](https://gist.github.com/winton/7811015fd6ee7b523232) to compile and browserify `client.coffee`.
 
-    module.exports = class extends Component
+#### Start the server
 
-      @State: class
-        constructor: ->
-          @layout = new Layout().render
+    coffee server.coffee
 
-      @View: class
-        constructor: (p, s) ->
-          @include(p)
-          @include(s)
+### Component Lifecycle
 
-        render: ->
-          content = HEADER("My Site")
+![Component Lifecycle](https://www.gliffy.com/go/publish/image/7745167/L.png)
 
-          if @server
-            @layout(content: content)
-          else
-            content
-
-    Layout = class extends Component
-
-      @State: class
-        constructor: ->
-
-      @View: class
-        constructor: (p, s) ->
-          @content = p.content
-        
-        render: ->
-          HTML @content
+*Note*: this is pseudocode, constructors have access to extended properties
