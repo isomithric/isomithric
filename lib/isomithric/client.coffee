@@ -13,10 +13,11 @@ module.exports = class
     #
     m.route.mode = "pathname"
 
-    routes.forEach (Component, path) ->
-      routes[path] =
-        controller: Component
-        view:       (c) -> c.render()
+    for path, Component of routes
+      do (path, Component) =>
+        routes[path] =
+          controller: Component
+          view:       (c) -> c.render()
 
     # ES6 promises polyfill.
     #
