@@ -24,15 +24,17 @@ module.exports = class
       do (path, Component) =>
         app.get path, (req, res, next) =>
           res.type "html"
-          res.end @render(
+          res.end @view(
             Component
-            server:
-              next: next
-              req:  req
-              res:  res
+            global:
+              server:
+                next: next
+                req:  req
+                res:  res
           )
 
-  render: (Component, props={}) ->
-    props.promises ||= []
-    output = new Component(props).render()
-    m.sync(props.promises).then -> render(output)
+  view: (Component, props={}) ->
+    props.global          ||= {}
+    props.global.promises ||= []
+    output = new Component(props).view()
+    m.sync(props.global.promises).then -> render(output)

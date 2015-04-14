@@ -1,26 +1,24 @@
 m = require "mithril"
 
-Component = require("../../../lib/isomithric").Component
-Server    = require("../../../lib/isomithric").Server
+iso    = require("../../../lib/isomithric")
+Server = iso.Server
 
 describe "Server", ->
 
   beforeAll ->
-    @Component = class extends Component
+    @Component = iso class
+      constructor: ->
       
-      @State: class
+      @View: iso class
         constructor: ->
-      
-      @View: class
-        constructor: ->
-        render:      -> HTML "hello"
+        view:        -> HTML "hello"
 
     @server = new Server("/": @Component)
 
   describe "#render", ->
 
     it "renders basic HTML", (done) ->
-      @server.render(@Component).then (output) ->
+      @server.view(@Component).then (output) ->
         expect(output).toBe "<html>hello</html>"
         done()
 
@@ -33,6 +31,6 @@ describe "Server", ->
         1
       )
 
-      @server.render(@Component, promises: [ promise ]).then (output) ->
+      @server.view(@Component, global: promises: [ promise ]).then (output) ->
         expect(output).toBe "<html>hello</html>"
         promise.then -> done()

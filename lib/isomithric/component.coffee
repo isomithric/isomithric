@@ -1,28 +1,62 @@
 Module = require "./module"
 
-module.exports = class Component
+class Component
 
-  constructor: ->
-    @render = @render.bind(@)
+  constructor: (@Klass) ->
+    @Klass = @bindProps()
+    @bindMethods()
 
-    if @constructor.View
-      Module.mixin(@constructor.View, Component.View)
+  bindMethods: ->
+    @Klass.prototype.component = (key, Klass, p, args...) ->
+      Component.buildHelper(Klass, fn_name)(key, p, args...)
 
-    if @constructor.State
-      Module.mixin(@constructor.State, Component.State)
+    for name, Klass of @Klass
+      do (name, Klass) =>
+        if Klass._isomithric?
+          fn_name = @KlassToFnName(name)
+          Klass   = @Klass[name]    = new Component(Klass).Klass
+          @Klass.prototype[fn_name] = Component.buildHelper(Klass, fn_name)
 
-      @state = new @constructor.State(arguments...)
+  bindProps: ->
+    Klass = @Klass
 
-  render: (p, children) ->
-    @view = new @constructor.View(p, @state)
-    @view.render(children)
+    class extends Module
 
-  @State: class extends Module
+      @mixin Klass
+      @_isomithric: true
+      
+      constructor: (p) ->
+        @include p
+        @global ||= {}
+        Klass.apply(@, arguments)
 
-  @View:  class extends Module
+  @buildHelper: (Klass, fn_name) ->
+    (args...) ->
+      key = if typeof args[0] == "string"
+        args.shift()
 
-    param: (id) =>
-      if @server
-        @server.req.params[id]
+      p = if typeof args[0] == "object"
+        args.shift()
+
+      p ||= {}
+
+      p.parent = @
+      p.global = @.global
+      
+      if fn_name.match(/view$/)
+        new Klass(p, args...).view()
+      else if key
+        @["_#{fn_name}_#{key}"] ||= new Klass(p, args...)
       else
-        m.route.param id
+        @["_#{fn_name}"] ||= new Klass(p, args...)
+
+  @component: (Klass) ->
+    new @(Klass).Klass
+
+  KlassToFnName: (name) ->
+    name
+      .replace(/([A-Z])/g, "_$1")
+      .toLowerCase()
+      .substring(1)
+
+module.exports = Component.component.bind(Component)
