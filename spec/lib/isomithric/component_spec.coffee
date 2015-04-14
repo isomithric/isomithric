@@ -1,4 +1,4 @@
-iso = require("../../../lib/isomithric")
+iso = require("../../../src/isomithric")
 
 describe "Component", ->
 

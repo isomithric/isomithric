@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Isomorphic javascript framework for Mithril",
   "main": "lib/isomithric.js",
-  "bin": {
-    "isomithric": "./bin/isomithric"
-  },
   "scripts": {
     "test": "./node_modules/.bin/jasmine"
   },
@@ -24,7 +21,6 @@
   },
   "homepage": "https://github.com/isomithric/isomithric",
   "dependencies": {
-    "coffee-script": "1.9.1",
     "es6-promise": "2.0.1",
     "mithril": "0.1.33",
     "mithril-node-render": "0.2.2",
@@ -32,6 +28,10 @@
     "xmlhttprequest": "1.7.0"
   },
   "devDependencies": {
+    "coffee-script": "1.9.1",
+    "gulp": "",
+    "gulp-coffee": "",
+    "gulp-run": "",
     "jasmine": "",
     "lodash": ""
   }

@@ -1,6 +1,6 @@
 m = require "mithril"
 
-iso    = require("../../../lib/isomithric")
+iso    = require("../../../src/isomithric")
 Server = iso.Server
 
 describe "Server", ->

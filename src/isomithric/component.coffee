@@ -1,4 +1,5 @@
 Module = require "./module"
+m      = require "mithril"
 
 class Component
 
@@ -29,6 +30,12 @@ class Component
         @include p
         @global ||= {}
         Klass.apply(@, arguments)
+
+      param: ->
+        if @global.server
+          @global.server.req.params[id]
+        else
+          m.route.param id
 
   @buildHelper: (Klass, fn_name) ->
     (args...) ->
