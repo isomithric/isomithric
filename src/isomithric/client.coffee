@@ -16,8 +16,9 @@ module.exports = class
     for path, Component of routes
       do (path, Component) =>
         routes[path] =
-          controller: Component
-          view:       (c) -> c.render()
+          controller: ->
+            new Component(global: promises: [])
+          view: (c) -> c.view()
 
     # ES6 promises polyfill.
     #

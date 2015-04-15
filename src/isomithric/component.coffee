@@ -31,7 +31,7 @@ class Component
         @global ||= {}
         Klass.apply(@, arguments)
 
-      param: ->
+      param: (id) ->
         if @global.server
           @global.server.req.params[id]
         else
