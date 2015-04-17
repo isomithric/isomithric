@@ -1,4 +1,11 @@
-fakejax    = require "xmlhttprequest"
+# Fake `XMLHttpRequest` for `m.request`.
+#
+global.window = require "xmlhttprequest"
+
+# Fake `setTimeout` for mithril.
+#
+global.window.setTimeout = setTimeout
+
 m          = require "mithril"
 render     = require "mithril-node-render"
 sugartags  = require "mithril.sugartags"
@@ -7,15 +14,7 @@ sugartags  = require "mithril.sugartags"
 #
 sugartags(m, global)
 
-# Fake `XMLHttpRequest` for `m.request`.
-#
-global.window = fakejax
-
-# Fake `setTimeout` for mithril.
-#
-global.window.setTimeout = setTimeout
-
-module.exports = class
+Server = class
 
   constructor: (app, routes) ->
     # Set up static routes.
@@ -26,6 +25,7 @@ module.exports = class
           res.type "html"
           @view(
             Component
+            res
             global:
               server:
                 next: next
@@ -33,9 +33,11 @@ module.exports = class
                 res:  res
           )
 
-  view: (Component, props={}) ->
+  view: (Component, res, props={}) ->
     props.global          ||= {}
     props.global.promises ||= []
     component = new Component(props)
     m.sync(props.global.promises).then ->
-      props.global.server.res.end render(component.view())
+      res.end render(component.view())
+
+module.exports = [ m, Server ]

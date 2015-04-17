@@ -1,6 +1,5 @@
-m = require "mithril"
-
-iso    = require("../../../src/isomithric")
+iso    = require("../../../src/isomithric")()
+m      = require "mithril"
 Server = iso.Server
 
 describe "Server", ->
@@ -18,8 +17,11 @@ describe "Server", ->
   describe "#render", ->
 
     it "renders basic HTML", (done) ->
-      @server.view(@Component).then (output) ->
-        expect(output).toBe "<html>hello</html>"
+      res = end: (output) ->
+      spyOn(res, "end")
+
+      @server.view(@Component, res.end).then (output) ->
+        expect(res.end).toHaveBeenCalledWith("<html>hello</html>")
         done()
 
     it "waits for promises", (done) ->
@@ -31,6 +33,13 @@ describe "Server", ->
         1
       )
 
-      @server.view(@Component, global: promises: [ promise ]).then (output) ->
-        expect(output).toBe "<html>hello</html>"
+      res = end: (output) ->
+      spyOn(res, "end")
+
+      @server.view(
+        @Component
+        res.end
+        global: promises: [ promise ]
+      ).then (output) ->
+        expect(res.end).toHaveBeenCalledWith("<html>hello</html>")
         promise.then -> done()

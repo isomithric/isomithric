@@ -1,29 +1,30 @@
-m         = require "mithril"
 promise   = require "es6-promise"
 sugartags = require "mithril.sugartags"
 
-module.exports = class
+module.exports = (m) ->
+  
+  class
 
-  constructor: (routes) ->
-    # Bind sugartags to window.
-    #
-    sugartags(m, window)
+    constructor: (routes) ->
+      # Bind sugartags to window.
+      #
+      sugartags(m, window)
 
-    # Set up routes.
-    #
-    m.route.mode = "pathname"
+      # Set up routes.
+      #
+      m.route.mode = "pathname"
 
-    for path, Component of routes
-      do (path, Component) =>
-        routes[path] =
-          controller: ->
-            new Component(global: promises: [])
-          view: (c) -> c.view()
+      for path, Component of routes
+        do (path, Component) =>
+          routes[path] =
+            controller: ->
+              new Component(global: promises: [])
+            view: (c) -> c.view()
 
-    # ES6 promises polyfill.
-    #
-    promise.polyfill()
+      # ES6 promises polyfill.
+      #
+      promise.polyfill()
 
-    # Kick mithril off.
-    #
-    m.route document.body, "/", routes
+      # Kick mithril off.
+      #
+      m.route document.body, "/", routes

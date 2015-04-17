@@ -1,3 +1,5 @@
 Module = require "./module"
 
-module.exports = class extends Module
+module.exports = (m) ->
+
+  class extends Module

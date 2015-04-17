@@ -1,69 +1,70 @@
 Module = require "./module"
-m      = require "mithril"
 
-class Component
+module.exports = (m) ->
+  
+  class Component
 
-  constructor: (@Klass) ->
-    @Klass = @bindProps()
-    @bindMethods()
+    constructor: (@Klass) ->
+      @Klass = @bindProps()
+      @bindMethods()
 
-  bindMethods: ->
-    @Klass.prototype.component = (key, Klass, p, args...) ->
-      Component.buildHelper(Klass, fn_name)(key, p, args...)
+    bindMethods: ->
+      @Klass.prototype.component = (key, Klass, p, args...) ->
+        Component.buildHelper(Klass, fn_name)(key, p, args...)
 
-    for name, Klass of @Klass
-      do (name, Klass) =>
-        if Klass._isomithric?
-          fn_name = @KlassToFnName(name)
-          Klass   = @Klass[name]    = new Component(Klass).Klass
-          @Klass.prototype[fn_name] = Component.buildHelper(Klass, fn_name)
+      for name, Klass of @Klass
+        do (name, Klass) =>
+          if Klass._isomithric?
+            fn_name = @KlassToFnName(name)
+            Klass   = @Klass[name]    = new Component(Klass).Klass
+            @Klass.prototype[fn_name] = Component.buildHelper(Klass, fn_name)
 
-  bindProps: ->
-    Klass = @Klass
+    bindProps: ->
+      Klass = @Klass
 
-    class extends Module
+      class extends Module
 
-      @mixin Klass
-      @_isomithric: true
-      
-      constructor: (p) ->
-        @include p
-        @global ||= {}
-        Klass.apply(@, arguments)
+        @mixin Klass
+        @_isomithric: true
+        
+        constructor: (p) ->
+          @include p
+          @global ||= {}
+          Klass.apply(@, arguments)
 
-      param: (id) ->
-        if @global.server
-          @global.server.req.params[id]
+        param: (id) ->
+          if @global.server
+            @global.server.req.params[id]
+          else
+            m.route.param id
+
+    @buildHelper: (Klass, fn_name) ->
+      (args...) ->
+        key = if typeof args[0] == "string"
+          args.shift()
+
+        p = if typeof args[0] == "object"
+          args.shift()
+
+        p ||= {}
+
+        p.parent = @
+        p.global = @.global
+        
+        if fn_name.match(/view$/)
+          new Klass(p, args...).view()
+        else if key
+          @["_#{fn_name}_#{key}"] ||= new Klass(p, args...)
         else
-          m.route.param id
+          @["_#{fn_name}"] ||= new Klass(p, args...)
 
-  @buildHelper: (Klass, fn_name) ->
-    (args...) ->
-      key = if typeof args[0] == "string"
-        args.shift()
+    @component: (Klass) ->
+      new @(Klass).Klass
 
-      p = if typeof args[0] == "object"
-        args.shift()
+    KlassToFnName: (name) ->
+      name
+        .replace(/([A-Z])/g, "_$1")
+        .toLowerCase()
+        .substring(1)
 
-      p ||= {}
-
-      p.parent = @
-      p.global = @.global
-      
-      if fn_name.match(/view$/)
-        new Klass(p, args...).view()
-      else if key
-        @["_#{fn_name}_#{key}"] ||= new Klass(p, args...)
-      else
-        @["_#{fn_name}"] ||= new Klass(p, args...)
-
-  @component: (Klass) ->
-    new @(Klass).Klass
-
-  KlassToFnName: (name) ->
-    name
-      .replace(/([A-Z])/g, "_$1")
-      .toLowerCase()
-      .substring(1)
-
-module.exports = Component.component.bind(Component)
+  Component.component.bind(Component)

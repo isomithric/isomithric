@@ -1,4 +1,4 @@
-iso = require("../../../src/isomithric")
+iso = require("../../../src/isomithric")()
 
 describe "Component", ->
 
