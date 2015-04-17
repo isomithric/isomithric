@@ -3,7 +3,8 @@ model     = require("./isomithric/model")
 client    = require("./isomithric/client")
 
 if typeof document == "undefined"
-  [ m, Server ] = require("./isomithric/server")
+  obscure = "." # for browserify
+  [ m, Server ] = require("#{obscure}/isomithric/server")
 
 builder = (m) ->
   iso        = component(m)
