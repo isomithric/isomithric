@@ -20,7 +20,7 @@ describe "Server", ->
       res = end: (output) ->
       spyOn(res, "end")
 
-      @server.view(@Component, res.end).then (output) ->
+      @server.view(@Component, res).then (output) ->
         expect(res.end).toHaveBeenCalledWith("<html>hello</html>")
         done()
 
@@ -38,7 +38,7 @@ describe "Server", ->
 
       @server.view(
         @Component
-        res.end
+        res
         global: promises: [ promise ]
       ).then (output) ->
         expect(res.end).toHaveBeenCalledWith("<html>hello</html>")
