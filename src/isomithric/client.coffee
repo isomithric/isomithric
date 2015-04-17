@@ -1,4 +1,3 @@
-promise   = require "es6-promise"
 sugartags = require "mithril.sugartags"
 
 module.exports = (m) ->
@@ -20,10 +19,6 @@ module.exports = (m) ->
             controller: ->
               new Component(global: promises: [])
             view: (c) -> c.view()
-
-      # ES6 promises polyfill.
-      #
-      promise.polyfill()
 
       # Kick mithril off.
       #

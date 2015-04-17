@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/isomithric/isomithric",
   "dependencies": {
-    "es6-promise": "2.0.1",
     "mithril": "0.1.33",
     "mithril-node-render": "0.2.2",
     "mithril.sugartags": "0.0.6",
