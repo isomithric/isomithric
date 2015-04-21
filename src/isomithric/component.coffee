@@ -9,9 +9,6 @@ module.exports = (m) ->
       @bindMethods()
 
     bindMethods: ->
-      @Klass.prototype.component = (key, Klass, p, args...) ->
-        Component.buildHelper(Klass, fn_name)(key, p, args...)
-
       for name, Klass of @Klass
         do (name, Klass) =>
           if Klass._isomithric?
@@ -30,6 +27,18 @@ module.exports = (m) ->
         constructor: (p) ->
           @include p
           @global ||= {}
+
+          for name, fn of @
+            stop   = name == "constructor"
+            stop ||= typeof @[name] != "function"
+            unless stop
+              do (name, fn) =>
+                @[name] = =>
+                  promise = fn.apply(@, arguments)
+                  if promise.then
+                    @global.promises.push promise
+                  promise
+
           Klass.apply(@, arguments)
 
         param: (id) ->
