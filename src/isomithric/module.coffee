@@ -39,4 +39,5 @@ module.exports = class Module
     @constructor.merge(@, from)
 
   mixin: (from) ->
-    @constructor.mixin(@, from)
+    @constructor.mixin(@constructor, from)
+    @include(from::)

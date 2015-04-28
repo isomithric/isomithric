@@ -9,11 +9,11 @@ describe "Component", ->
         @constructed = true
         @extra_arg   = arg
         @hello_value = @hello
-        @my_component(world: "world", true)
-        @my_component("key", world: "world", true)
+        @myComponent(world: "world", true)
+        @myComponent("key", world: "world", true)
 
       view: ->
-        @my_view(world: "world", true)
+        @myView(world: "world", true)
       
       @MyView: iso class
         constructor: (p, @bool) ->
@@ -42,24 +42,24 @@ describe "Component", ->
   describe "sub-components", ->
 
     it "binds the parameters", ->
-      expect(@component.my_component().view()).toBe "hello world"
-      expect(@component.my_component("key").view()).toBe "hello world"
+      expect(@component.myComponent().view()).toBe "hello world"
+      expect(@component.myComponent("key").view()).toBe "hello world"
 
     it "caches the component", ->
-      expect(@component._my_component).not.toBe undefined
-      first  = @component.my_component()
-      second = @component.my_component()
+      expect(@component.my_component).not.toBe undefined
+      first  = @component.myComponent()
+      second = @component.myComponent()
       expect(first).toBe second
 
     it "caches the component by key", ->
-      expect(@component._my_component_key).not.toBe undefined
-      first  = @component.my_component("key")
-      second = @component.my_component("key")
+      expect(@component.my_component_key).not.toBe undefined
+      first  = @component.myComponent("key")
+      second = @component.myComponent("key")
       expect(first).toBe second
 
     it "passes the global object along", ->
       expect(@component.global).not.toBe undefined
-      expect(@component.my_component().global).toBe @component.global
+      expect(@component.myComponent().global).toBe @component.global
 
   describe "view", ->
 
@@ -67,8 +67,8 @@ describe "Component", ->
       expect(@view).toBe "hello world"
 
     it "does not cache the view", ->
-      @component.my_view()
-      expect(@component._my_view).toBe undefined
+      @component.myView()
+      expect(@component.my_view).toBe undefined
 
   describe "mixins", ->
 

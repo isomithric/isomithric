@@ -7,10 +7,7 @@ describe "Server", ->
   beforeAll ->
     @Component = iso class
       constructor: ->
-      
-      @View: iso class
-        constructor: ->
-        view:        -> HTML "hello"
+      view:        -> HTML "hello"
 
     @server = new Server("/": @Component)
 

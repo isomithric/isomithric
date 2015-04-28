@@ -12,9 +12,11 @@ module.exports = (m) ->
       for name, Klass of @Klass
         do (name, Klass) =>
           if Klass._isomithric?
-            fn_name = @KlassToFnName(name)
-            Klass   = @Klass[name]    = new Component(Klass).Klass
-            @Klass.prototype[fn_name] = Component.buildHelper(Klass, fn_name)
+            fn_name  = @klassToFnName(name)
+            var_name = @klassToVarName(name)
+
+            Klass    = @Klass[name]   = new Component(Klass).Klass
+            @Klass.prototype[fn_name] = Component.buildHelper(Klass, fn_name, var_name)
 
     bindProps: ->
       Klass = @Klass
@@ -26,7 +28,11 @@ module.exports = (m) ->
         
         constructor: (p) ->
           @include p
+          
           @global ||= {}
+          @server   = @global.server
+
+          Klass.apply(@, arguments)
 
           for name, fn of @
             stop   = name == "constructor"
@@ -35,19 +41,17 @@ module.exports = (m) ->
               do (name, fn) =>
                 @[name] = =>
                   promise = fn.apply(@, arguments)
-                  if promise.then
+                  if promise && promise.then
                     @global.promises.push promise
                   promise
 
-          Klass.apply(@, arguments)
-
         param: (id) ->
-          if @global.server
-            @global.server.req.params[id]
+          if @server
+            @server.req.params[id]
           else
             m.route.param id
 
-    @buildHelper: (Klass, fn_name) ->
+    @buildHelper: (Klass, fn_name, var_name) ->
       (args...) ->
         key = if typeof args[0] == "string"
           args.shift()
@@ -59,18 +63,22 @@ module.exports = (m) ->
 
         p.parent = @
         p.global = @.global
+        p.server = @.global.server
         
-        if fn_name.match(/view$/)
+        if fn_name.match(/View$/)
           new Klass(p, args...).view()
         else if key
-          @["_#{fn_name}_#{key}"] ||= new Klass(p, args...)
+          @["#{var_name}_#{key}"] ||= new Klass(p, args...)
         else
-          @["_#{fn_name}"] ||= new Klass(p, args...)
+          @["#{var_name}"] ||= new Klass(p, args...)
 
     @component: (Klass) ->
       new @(Klass).Klass
 
-    KlassToFnName: (name) ->
+    klassToFnName: (name) ->
+      name.charAt(0).toLowerCase() + name.slice(1)
+
+    klassToVarName: (name) ->
       name
         .replace(/([A-Z])/g, "_$1")
         .toLowerCase()
