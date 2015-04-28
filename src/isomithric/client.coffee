@@ -13,10 +13,13 @@ module.exports = (m) ->
       #
       m.route.mode = "pathname"
 
+      # Define routes.
+      #
       for path, Component of routes
         do (path, Component) =>
           routes[path] =
             controller: ->
+              m.redraw.strategy "none"
               new Component(global: promises: [])
             view: (c) -> c.view()
 
