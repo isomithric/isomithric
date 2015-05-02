@@ -2,32 +2,25 @@
 
 An isomorphic javascript framework on top of Mithril.
 
-### Philosophy
-
-* Class-based unidirectional data flow
-* Apps are comprised of "Components" and "Models"
-* Components hold state and business logic for views
-* Models hold persistent data and business logic for that data
-
 ### Goals
 
-* Server-side render on first page load, dynamic rendering for subsequent actions
-* Server-side [m.request](http://lhorie.github.io/mithril/mithril.request.html) implementation
-* Server-side [m.route.param](http://lhorie.github.io/mithril/mithril.route.html#defining-routes) implementation
-* Global [sugartags](https://github.com/jsguy/mithril.sugartags)
-* Automatic constructor property argument binding
-* Mixin support for classes
+* Provide a generic pattern for creating mithril components with uni-directional data flow
+* Server and client side rendering for components using a common routes file
+* Implement `m.request` for server and client side
+* Automatically wait for requests to finish before rendering server side
 
 ### Install
 
     npm install isomithric
 
-### Example
+### Typical App Structure
+
+* `components/` - Classes that hold state across redraws
+* `models/` - Classes that access and store persistent (server) data
+* `views/` - Classes that contain render logic and exist on a per-redraw basis
+* `client.coffee` - Loads isomithric for the client (typically browserified)
+* `server.coffee` - Loads isomithric for the server (`node server.coffee`)
+
+### Example Project
 
 Checkout the [isomithric-example project](https://github.com/isomithric/isomithric-example) for a working example.
-
-### Component Lifecycle
-
-![Component Lifecycle](https://www.gliffy.com/go/publish/image/7745167/L.png)
-
-*Note*: this is pseudocode, constructors have access to extended properties
