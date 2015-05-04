@@ -87,7 +87,7 @@ You can easily add another class' instance and class methods with one call:
 
 ### Promise detection
 
-Isomithric knows to do the final server side render when all promises returned from a function have resolved.
+Isomithric knows to do the final server side render when all promises returned from any function within an Isomithric class have resolved.
 
     iso class
       constructor: ->
