@@ -60,7 +60,7 @@ Isomithric classes take an options object as the first parameter to the construc
 When you add a reference to another isomithric class, you have access to a helper method that constructs an instance of that class:
 
     iso class
-      MyComponent: require "./component"
+      @MyComponent: require "./component"
       
       constructor: ->
         @myComponent(title: "hello")  # `@my_component = new Component(title: "hello")`
@@ -69,7 +69,7 @@ When you add a reference to another isomithric class, you have access to a helpe
 If you define a component ending in `View`, then the helper behaves differently:
 
     iso class
-      MyView: require "../views/view"
+      @MyView: require "../views/view"
       
       constructor: ->
         @myView(title: "hello")  # `new MyView(title: "hello").view()`
@@ -100,7 +100,7 @@ Isomithric knows to do the final server side render when all promises returned f
       
       view: -> "hello"
 
-If this class were a route component, it would render "hello" after 100ms. This functionality is useful when you need to wait for all `m.request` promises to resolve before rendering.
+If this class were a route component, it would render "hello" after 100ms. This functionality is useful when you need to wait for all `m.request` (or other) promises to resolve before rendering.
         
 ### Example project
 
