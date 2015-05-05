@@ -11,7 +11,7 @@ module.exports = (m) ->
     bindMethods: ->
       for name, Klass of @Klass
         do (name, Klass) =>
-          if Klass._isomithric?
+          if Klass._isomithric? && name != "_klass"
             fn_name  = @klassToFnName(name)
             var_name = @klassToVarName(name)
 
@@ -25,6 +25,7 @@ module.exports = (m) ->
 
         @mixin Klass
         @_isomithric: true
+        @_klass: Klass
         
         constructor: (p) ->
           @include p
@@ -61,9 +62,9 @@ module.exports = (m) ->
 
         p ||= {}
 
-        p.parent = @
-        p.global = @.global
-        p.server = @.global.server
+        p.parent ||= @
+        p.global ||= @.global
+        p.server ||= @.global.server
         
         if fn_name.match(/View$/)
           new Klass(p, args...).view()
